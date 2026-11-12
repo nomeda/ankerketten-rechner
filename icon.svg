@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+>
+  <defs>
+    <linearGradient
+      id="background"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop
+        offset="0"
+        stop-color="#082f49"
+      />
+
+      <stop
+        offset="1"
+        stop-color="#0284c7"
+      />
+    </linearGradient>
+  </defs>
+
+  <rect
+    width="512"
+    height="512"
+    rx="100"
+    fill="url(#background)"
+  />
+
+  <circle
+    cx="256"
+    cy="135"
+    r="55"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="30"
+  />
+
+  <path
+    d="
+      M256 190
+      L256 390
+
+      M170 245
+      L342 245
+
+      M105 315
+      C115 405 180 455 256 455
+      C332 455 397 405 407 315
+
+      M105 315
+      L155 350
+
+      M407 315
+      L357 350
+    "
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="32"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <title>Ankerketten-Rechner</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+
+  <meta name="theme-color" content="#082f49">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  >
+
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Ankerkette"
+  >
+
+  <style>
+    :root {
+      --navy: #082f49;
+      --blue-dark: #075985;
+      --blue: #0284c7;
+      --blue-light: #e0f2fe;
+      --background: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --success: #15803d;
+      --success-bg: #dcfce7;
+      --warning: #a16207;
+      --warning-bg: #fef3c7;
+      --danger: #b91c1c;
+      --danger-bg: #fee2e2;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--background);
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--background);
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    header {
+      padding:
+        max(24px, env(safe-area-inset-top))
+        16px
+        24px;
+      color: white;
+      text-align: center;
+      background:
+        linear-gradient(
+          135deg,
+          var(--navy),
+          var(--blue)
+        );
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+    }
+
+    header p {
+      max-width: 850px;
+      margin: 0 auto;
+      line-height: 1.5;
+      opacity: 0.92;
+    }
+
+    main {
+      width: min(1280px, calc(100% - 24px));
+      margin: 24px auto 40px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 440px) 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 5px 16px rgba(15, 23, 42, 0.07);
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 1.3rem;
+    }
+
+    h3 {
+      margin: 25px 0 10px;
+      font-size: 1.05rem;
+    }
+
+    .section-title {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .mode-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .mode-button {
+      min-height: 60px;
+      padding: 10px;
+      color: #334155;
+      background: #e2e8f0;
+      border: 2px solid transparent;
+      border-radius: 9px;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mode-button.active {
+      color: white;
+      background: var(--blue);
+      border-color: var(--blue-dark);
+    }
+
+    .mode-description {
+      margin: -8px 0 20px;
+      padding: 12px;
+      color: #0c4a6e;
+      background: var(--blue-light);
+      border-radius: 8px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-width: 0;
+      padding: 12px;
+      color: var(--text);
+      background: white;
+      border: 1px solid var(--border);
+      outline: none;
+      font: inherit;
+      font-size: 16px;
+    }
+
+    select {
+      border-radius: 8px;
+    }
+
+    input {
+      border-radius: 8px 0 0 8px;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    input[readonly] {
+      color: #334155;
+      background: #f1f5f9;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .unit {
+      display: flex;
+      min-width: 72px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      color: #334155;
+      background: #e2e8f0;
+      border: 1px solid var(--border);
+      border-left: 0;
+      border-radius: 0 8px 8px 0;
+      font-weight: 700;
+    }
+
+    .description {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .calculated-info {
+      margin: 4px 0 16px;
+      padding: 12px;
+      color: #0c4a6e;
+      background: var(--blue-light);
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .calculate-button {
+      width: 100%;
+      margin-top: 6px;
+      padding: 14px 18px;
+      color: white;
+      background: var(--blue);
+      border: 0;
+      border-radius: 9px;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .calculate-button:hover {
+      background: var(--blue-dark);
+    }
+
+    .error {
+      display: none;
+      margin-top: 14px;
+      padding: 12px;
+      color: var(--danger);
+      background: var(--danger-bg);
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      line-height: 1.45;
+    }
+
+    .status {
+      margin-bottom: 18px;
+      padding: 15px;
+      border-left: 5px solid;
+      border-radius: 9px;
+      line-height: 1.5;
+      font-weight: 650;
+    }
+
+    .status.neutral {
+      color: #334155;
+      background: #e2e8f0;
+      border-color: #64748b;
+    }
+
+    .status.success {
+      color: #166534;
+      background: var(--success-bg);
+      border-color: var(--success);
+    }
+
+    .status.warning {
+      color: #854d0e;
+      background: var(--warning-bg);
+      border-color: var(--warning);
+    }
+
+    .status.danger {
+      color: #991b1b;
+      background: var(--danger-bg);
+      border-color: var(--danger);
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(175px, 1fr));
+      gap: 12px;
+    }
+
+    .result {
+      min-height: 100px;
+      padding: 14px;
+      background: var(--blue-light);
+      border-left: 4px solid var(--blue);
+      border-radius: 8px;
+    }
+
+    .result.primary {
+      color: white;
+      background: var(--blue);
+      border-left-color: var(--navy);
+    }
+
+    .result-label {
+      margin-bottom: 6px;
+      font-size: 0.82rem;
+      opacity: 0.82;
+    }
+
+    .result-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .result-detail {
+      margin-top: 5px;
+      font-size: 0.75rem;
+      line-height: 1.3;
+      opacity: 0.75;
+    }
+
+    .diagram-container {
+      margin-top: 10px;
+      overflow: hidden;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-height: 300px;
+    }
+
+    .formula-box {
+      margin-top: 20px;
+      padding: 16px;
+      color: #e2e8f0;
+      background: #0f172a;
+      border-radius: 10px;
+      overflow-x: auto;
+      line-height: 1.8;
+    }
+
+    .formula-box code {
+      font-family: "Courier New", monospace;
+    }
+
+    .note {
+      margin-top: 20px;
+      padding: 15px;
+      color: #78350f;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 9px;
+      line-height: 1.55;
+    }
+
+    footer {
+      padding:
+        22px
+        22px
+        max(22px, env(safe-area-inset-bottom));
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 850px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      main {
+        margin-top: 12px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .mode-selector {
+        grid-template-columns: 1fr;
+      }
+
+      .result-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .result-value {
+        font-size: 1.08rem;
+      }
+    }
+
+    @media (max-width: 350px) {
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>⚓ Ankerketten-Rechner</h1>
+
+    <p>
+      Statische Berechnung einer Ankerkette anhand der
+      Kettenliniengleichung – mit direkter Krafteingabe
+      oder Abschätzung der Windlast.
+    </p>
+  </header>
+
+  <main>
+    <div class="layout">
+
+      <!-- Eingaben -->
+      <section class="card">
+        <h2>Berechnungsart</h2>
+
+        <div class="mode-selector">
+          <button
+            id="modeRequiredButton"
+            class="mode-button active"
+            type="button"
+          >
+            Benötigte Länge berechnen
+          </button>
+
+          <button
+            id="modeAvailableButton"
+            class="mode-button"
+            type="button"
+          >
+            Vorhandene Länge prüfen
+          </button>
+        </div>
+
+        <div id="modeDescription" class="mode-description">
+          Berechnung der notwendigen Kettenlänge für einen
+          horizontalen Kettenverlauf am Meeresboden.
+        </div>
+
+        <h2>Wassertiefe und Boot</h2>
+
+        <div class="field">
+          <label for="waterDepth">Wassertiefe</label>
+
+          <div class="input-row">
+            <input
+              id="waterDepth"
+              type="number"
+              min="0.1"
+              step="0.1"
+              value="10"
+            >
+            <span class="unit">m</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="additionalWater">
+            Zusätzlicher Wasserstand
+          </label>
+
+          <div class="input-row">
+            <input
+              id="additionalWater"
+              type="number"
+              min="0"
+              step="0.1"
+              value="0"
+            >
+            <span class="unit">m</span>
+          </div>
+
+          <span class="description">
+            Tidenhub oder zusätzliche Wasserstandsreserve.
+          </span>
+        </div>
+
+        <div class="field">
+          <label for="bowHeight">
+            Höhe der Bugrolle über dem Wasser
+          </label>
+
+          <div class="input-row">
+            <input
+              id="bowHeight"
+              type="number"
+              min="0"
+              step="0.1"
+              value="1.5"
+            >
+            <span class="unit">m</span>
+          </div>
+        </div>
+
+        <h2 class="section-title">Ankerkette</h2>
+
+        <div class="field">
+          <label for="chainPreset">
+            Kettendurchmesser
+          </label>
+
+          <select id="chainPreset">
+            <option value="6">
+              6 mm – ca. 0,80 kg/m
+            </option>
+
+            <option value="8" selected>
+              8 mm – ca. 1,40 kg/m
+            </option>
+
+            <option value="10">
+              10 mm – ca. 2,30 kg/m
+            </option>
+
+            <option value="custom">
+              Benutzerdefiniertes Gewicht
+            </option>
+          </select>
+
+          <span class="description">
+            Näherungswerte für kalibrierte, kurzgliedrige
+            Ankerketten. Herstellerangaben haben Vorrang.
+          </span>
+        </div>
+
+        <div class="field">
+          <label for="chainMass">
+            Masse der Kette pro Meter
+          </label>
+
+          <div class="input-row">
+            <input
+              id="chainMass"
+              type="number"
+              min="0.01"
+              step="0.01"
+              value="1.40"
+              readonly
+            >
+            <span class="unit">kg/m</span>
+          </div>
+        </div>
+
+        <h2 class="section-title">Horizontale Belastung</h2>
+
+        <div class="field">
+          <label for="loadSource">
+            Ermittlung der Belastung
+          </label>
+
+          <select id="loadSource">
+            <option value="wind" selected>
+              Aus Windgeschwindigkeit berechnen
+            </option>
+
+            <option value="direct">
+              Kraft direkt eingeben
+            </option>
+          </select>
+        </div>
+
+        <div id="directLoadFields" class="hidden">
+          <div class="field">
+            <label for="horizontalLoad">
+              Horizontale Belastung
+            </label>
+
+            <div class="input-row">
+              <input
+                id="horizontalLoad"
+                type="number"
+                min="0.001"
+                step="0.1"
+                value="2"
+              >
+              <span class="unit">kN</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="windLoadFields">
+          <div class="field">
+            <label for="windSpeed">
+              Windgeschwindigkeit
+            </label>
+
+            <div class="input-row">
+              <input
+                id="windSpeed"
+                type="number"
+                min="0.1"
+                step="1"
+                value="40"
+              >
+              <span class="unit">kn</span>
+            </div>
+
+            <span class="description">
+              Möglichst die erwartete Böengeschwindigkeit
+              verwenden.
+            </span>
+          </div>
+
+          <div class="field">
+            <label for="effectiveWindArea">
+              Effektive Windangriffsfläche CᵈA
+            </label>
+
+            <div class="input-row">
+              <input
+                id="effectiveWindArea"
+                type="number"
+                min="0.01"
+                step="0.1"
+                value="8"
+              >
+              <span class="unit">m²</span>
+            </div>
+
+            <span class="description">
+              Fläche einschließlich der Widerstandsbeiwerte
+              von Rumpf, Aufbau, Mast, Rigg und Ausrüstung.
+            </span>
+          </div>
+
+          <div id="windLoadPreview" class="calculated-info">
+            Die Windlast wird automatisch berechnet.
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="loadFactor">
+            Zusätzlicher Lastfaktor
+          </label>
+
+          <div class="input-row">
+            <input
+              id="loadFactor"
+              type="number"
+              min="1"
+              step="0.1"
+              value="1"
+            >
+            <span class="unit">×</span>
+          </div>
+
+          <span class="description">
+            Zusätzlicher Faktor für Unsicherheiten. Bei Verwendung
+            der Böengeschwindigkeit die Böe nicht doppelt ansetzen.
+          </span>
+        </div>
+
+        <div id="seabedReserveField" class="field">
+          <label for="seabedReserve">
+            Gewünschte Kette auf dem Boden
+          </label>
+
+          <div class="input-row">
+            <input
+              id="seabedReserve"
+              type="number"
+              min="0"
+              step="0.5"
+              value="10"
+            >
+            <span class="unit">m</span>
+          </div>
+        </div>
+
+        <div id="availableLengthField" class="field hidden">
+          <label for="availableLength">
+            Ausgebrachte Kettenlänge
+          </label>
+
+          <div class="input-row">
+            <input
+              id="availableLength"
+              type="number"
+              min="0.1"
+              step="0.5"
+              value="50"
+            >
+            <span class="unit">m</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="workingLoad">
+            Zulässige Arbeitslast der Kette
+          </label>
+
+          <div class="input-row">
+            <input
+              id="workingLoad"
+              type="number"
+              min="0"
+              step="0.1"
+              value="0"
+            >
+            <span class="unit">kN</span>
+          </div>
+
+          <span class="description">
+            Optional. Bei 0 erfolgt keine Festigkeitsprüfung.
+          </span>
+        </div>
+
+        <button
+          id="calculateButton"
+          class="calculate-button"
+          type="button"
+        >
+          Berechnung durchführen
+        </button>
+
+        <div id="errorMessage" class="error"></div>
+      </section>
+
+      <!-- Ergebnisse -->
+      <section class="card">
+        <h2>Berechnungsergebnis</h2>
+
+        <div id="mainStatus" class="status neutral">
+          Noch keine Berechnung durchgeführt.
+        </div>
+
+        <div class="result-grid">
+          <div class="result primary">
+            <div id="totalLengthLabel" class="result-label">
+              Benötigte Kettenlänge
+            </div>
+
+            <div id="totalLength" class="result-value">–</div>
+
+            <div id="totalLengthDetail" class="result-detail">
+              Freihängend plus Bodenlänge
+            </div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Freihängende Kette
+            </div>
+            <div id="suspendedLength" class="result-value">–</div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Kette auf dem Boden
+            </div>
+            <div id="seabedLength" class="result-value">–</div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Horizontaler Abstand
+            </div>
+            <div id="horizontalSpan" class="result-value">–</div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Winkel am Anker
+            </div>
+            <div id="anchorAngle" class="result-value">–</div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Zugkraft am Anker
+            </div>
+            <div id="anchorTension" class="result-value">–</div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Zugkraft an der Bugrolle
+            </div>
+            <div id="bowTension" class="result-value">–</div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Grundlast vor Faktor
+            </div>
+            <div id="baseLoad" class="result-value">–</div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Effektive Horizontallast
+            </div>
+            <div id="effectiveLoad" class="result-value">–</div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Grenzlast für 0°
+            </div>
+            <div
+              id="maximumZeroAngleLoad"
+              class="result-value"
+            >
+              –
+            </div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Kettengewicht unter Wasser
+            </div>
+            <div id="submergedWeight" class="result-value">–</div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Höhe über Grund
+            </div>
+            <div id="verticalHeight" class="result-value">–</div>
+          </div>
+
+          <div class="result">
+            <div class="result-label">
+              Parameter a = H/w
+            </div>
+            <div id="parameterA" class="result-value">–</div>
+          </div>
+        </div>
+
+        <div
+          id="loadStatus"
+          class="status neutral"
+          style="margin-top: 18px;"
+        >
+          Keine Festigkeitsprüfung durchgeführt.
+        </div>
+
+        <h3>Darstellung der Kettenlinie</h3>
+
+        <div class="diagram-container">
+          <svg
+            id="diagram"
+            viewBox="0 0 850 430"
+            role="img"
+            aria-label="Darstellung der Ankerkette"
+          ></svg>
+        </div>
+
+        <div class="formula-box">
+          <code>
+            F<sub>Wind</sub> =
+            ½ · ρ<sub>Luft</sub> · V² · C<sub>D</sub>A<br>
+
+            h = Tiefe + Wasserstand + Bugrollenhöhe<br>
+
+            w = m · g ·
+            (1 − ρ<sub>Wasser</sub> / ρ<sub>Stahl</sub>)<br>
+
+            a = H / w<br>
+
+            s = √(h² + 2 · H · h / w)<br>
+
+            x = a · arcosh(1 + h / a)<br>
+
+            H<sub>max</sub> =
+            w · (L² − h²) / (2 · h)
+          </code>
+        </div>
+
+        <div class="note">
+          <strong>Wichtiger Hinweis:</strong>
+          Das Programm verwendet ein vereinfachtes statisches
+          Modell. Wellen, Schiffsbewegungen, Gieren,
+          Ruckbelastungen, Strömung, Bodenreibung, Gefälle,
+          Kettenelastizität, Ankertyp und Ankergrund werden nicht
+          vollständig berücksichtigt. Das Ergebnis ist keine
+          garantierte sichere Ankerauslegung.
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    Ankerketten-Rechner – statisches Kettenlinien- und
+    Windlastmodell
+  </footer>
+
+  <script>
+    "use strict";
+
+    const GRAVITY = 9.80665;
+    const WATER_DENSITY = 1025;
+    const STEEL_DENSITY = 7850;
+    const AIR_DENSITY = 1.225;
+    const KNOTS_TO_METERS_PER_SECOND = 0.514444;
+
+    const CHAIN_MASSES = {
+      "6": 0.80,
+      "8": 1.40,
+      "10": 2.30
+    };
+
+    let calculationMode = "required";
+
+    function element(id) {
+      return document.getElementById(id);
+    }
+
+    function readNumber(id) {
+      return Number(
+        String(element(id).value)
+          .trim()
+          .replace(",", ".")
+      );
+    }
+
+    function setText(id, text) {
+      element(id).textContent = text;
+    }
+
+    function formatNumber(value, decimals = 2) {
+      if (!Number.isFinite(value)) {
+        return "–";
+      }
+
+      return value.toLocaleString("de-DE", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function formatMeters(value) {
+      return formatNumber(value, 2) + " m";
+    }
+
+    function formatKilonewtons(value) {
+      return formatNumber(value / 1000, 2) + " kN";
+    }
+
+    function setStatus(id, type, message) {
+      const box = element(id);
+      box.className = "status " + type;
+      box.textContent = message;
+    }
+
+    function showError(message) {
+      const box = element("errorMessage");
+      box.textContent = message;
+      box.style.display = "block";
+    }
+
+    function hideError() {
+      const box = element("errorMessage");
+      box.textContent = "";
+      box.style.display = "none";
+    }
+
+    function calculateWindLoad(speedKnots, effectiveArea) {
+      const speedMetersPerSecond =
+        speedKnots * KNOTS_TO_METERS_PER_SECOND;
+
+      const dynamicPressure =
+        0.5 *
+        AIR_DENSITY *
+        speedMetersPerSecond *
+        speedMetersPerSecond;
+
+      return {
+        speedMetersPerSecond,
+        dynamicPressure,
+        effectiveArea,
+        force: dynamicPressure * effectiveArea
+      };
+    }
+
+    function setMode(mode) {
+      calculationMode = mode;
+
+      const requiredButton = element("modeRequiredButton");
+      const availableButton = element("modeAvailableButton");
+
+      if (mode === "required") {
+        requiredButton.classList.add("active");
+        availableButton.classList.remove("active");
+
+        element("seabedReserveField").classList.remove("hidden");
+        element("availableLengthField").classList.add("hidden");
+
+        setText(
+          "modeDescription",
+          "Die Anwendung berechnet die erforderliche " +
+          "Kettenlänge für einen horizontalen Verlauf am " +
+          "Ablösepunkt vom Meeresboden."
+        );
+
+        setText(
+          "totalLengthLabel",
+          "Benötigte Kettenlänge"
+        );
+
+        setText(
+          "totalLengthDetail",
+          "Freihängend plus gewünschte Bodenlänge"
+        );
+      } else {
+        requiredButton.classList.remove("active");
+        availableButton.classList.add("active");
+
+        element("seabedReserveField").classList.add("hidden");
+        element("availableLengthField").classList.remove("hidden");
+
+        setText(
+          "modeDescription",
+          "Die Anwendung prüft, ob die vorhandene Kette noch " +
+          "auf dem Boden liegt. Bei vollständigem Abheben wird " +
+          "der Winkel am Anker berechnet."
+        );
+
+        setText(
+          "totalLengthLabel",
+          "Vorhandene Kettenlänge"
+        );
+
+        setText(
+          "totalLengthDetail",
+          "Gesamte ausgebrachte Kette"
+        );
+      }
+
+      calculate();
+    }
+
+    function updateChainSelection() {
+      const preset = element("chainPreset").value;
+      const massInput = element("chainMass");
+
+      if (preset === "custom") {
+        massInput.readOnly = false;
+      } else {
+        massInput.value = CHAIN_MASSES[preset].toFixed(2);
+        massInput.readOnly = true;
+      }
+
+      calculate();
+    }
+
+    function updateLoadSource() {
+      const source = element("loadSource").value;
+
+      element("directLoadFields").classList.toggle(
+        "hidden",
+        source !== "direct"
+      );
+
+      element("windLoadFields").classList.toggle(
+        "hidden",
+        source !== "wind"
+      );
+
+      calculate();
+    }
+
+    function readInput() {
+      return {
+        waterDepth: readNumber("waterDepth"),
+        additionalWater: readNumber("additionalWater"),
+        bowHeight: readNumber("bowHeight"),
+        chainMass: readNumber("chainMass"),
+        loadSource: element("loadSource").value,
+        horizontalLoadKN: readNumber("horizontalLoad"),
+        windSpeedKnots: readNumber("windSpeed"),
+        effectiveWindArea: readNumber("effectiveWindArea"),
+        loadFactor: readNumber("loadFactor"),
+        seabedReserve: readNumber("seabedReserve"),
+        availableLength: readNumber("availableLength"),
+        workingLoadKN: readNumber("workingLoad")
+      };
+    }
+
+    function validateInput(input) {
+      const commonValues = [
+        input.waterDepth,
+        input.additionalWater,
+        input.bowHeight,
+        input.chainMass,
+        input.loadFactor,
+        input.workingLoadKN
+      ];
+
+      if (commonValues.some(value => !Number.isFinite(value))) {
+        throw new Error(
+          "Bitte in allen sichtbaren Feldern gültige Zahlen eingeben."
+        );
+      }
+
+      if (input.waterDepth <= 0) {
+        throw new Error(
+          "Die Wassertiefe muss größer als 0 sein."
+        );
+      }
+
+      if (
+        input.additionalWater < 0 ||
+        input.bowHeight < 0
+      ) {
+        throw new Error(
+          "Wasserstand und Bugrollenhöhe dürfen nicht negativ sein."
+        );
+      }
+
+      if (input.chainMass <= 0) {
+        throw new Error(
+          "Die Kettenmasse muss größer als 0 sein."
+        );
+      }
+
+      if (input.loadFactor < 1) {
+        throw new Error(
+          "Der Lastfaktor muss mindestens 1 betragen."
+        );
+      }
+
+      if (input.workingLoadKN < 0) {
+        throw new Error(
+          "Die Arbeitslast darf nicht negativ sein."
+        );
+      }
+
+      if (
+        input.loadSource === "direct" &&
+        (
+          !Number.isFinite(input.horizontalLoadKN) ||
+          input.horizontalLoadKN <= 0
+        )
+      ) {
+        throw new Error(
+          "Die horizontale Belastung muss größer als 0 sein."
+        );
+      }
+
+      if (input.loadSource === "wind") {
+        if (
+          !Number.isFinite(input.windSpeedKnots) ||
+          input.windSpeedKnots <= 0
+        ) {
+          throw new Error(
+            "Die Windgeschwindigkeit muss größer als 0 sein."
+          );
+        }
+
+        if (
+          !Number.isFinite(input.effectiveWindArea) ||
+          input.effectiveWindArea <= 0
+        ) {
+          throw new Error(
+            "Die Windangriffsfläche muss größer als 0 sein."
+          );
+        }
+      }
+
+      if (
+        calculationMode === "required" &&
+        (
+          !Number.isFinite(input.seabedReserve) ||
+          input.seabedReserve < 0
+        )
+      ) {
+        throw new Error(
+          "Die Bodenlänge darf nicht negativ sein."
+        );
+      }
+
+      if (
+        calculationMode === "available" &&
+        (
+          !Number.isFinite(input.availableLength) ||
+          input.availableLength <= 0
+        )
+      ) {
+        throw new Error(
+          "Die vorhandene Kettenlänge muss größer als 0 sein."
+        );
+      }
+    }
+
+    function calculateVerticalRise(
+      verticalForceAtAnchor,
+      horizontalForce,
+      weightPerMeter,
+      chainLength
+    ) {
+      const lowerTension = Math.hypot(
+        horizontalForce,
+        verticalForceAtAnchor
+      );
+
+      const upperTension = Math.hypot(
+        horizontalForce,
+        verticalForceAtAnchor +
+          weightPerMeter * chainLength
+      );
+
+      return (
+        (upperTension - lowerTension) /
+        weightPerMeter
+      );
+    }
+
+    function solveVerticalForceAtAnchor(
+      horizontalForce,
+      weightPerMeter,
+      chainLength,
+      height
+    ) {
+      let lowerBound = 0;
+
+      let upperBound = Math.max(
+        horizontalForce,
+        weightPerMeter * chainLength,
+        1
+      );
+
+      let found = false;
+
+      for (let index = 0; index < 150; index++) {
+        const rise = calculateVerticalRise(
+          upperBound,
+          horizontalForce,
+          weightPerMeter,
+          chainLength
+        );
+
+        if (rise >= height) {
+          found = true;
+          break;
+        }
+
+        upperBound *= 2;
+      }
+
+      if (!found) {
+        throw new Error(
+          "Für diese Eingaben konnte keine Kettenlinie bestimmt werden."
+        );
+      }
+
+      for (let index = 0; index < 150; index++) {
+        const midpoint =
+          (lowerBound + upperBound) / 2;
+
+        const rise = calculateVerticalRise(
+          midpoint,
+          horizontalForce,
+          weightPerMeter,
+          chainLength
+        );
+
+        if (rise < height) {
+          lowerBound = midpoint;
+        } else {
+          upperBound = midpoint;
+        }
+      }
+
+      return (lowerBound + upperBound) / 2;
+    }
+
+    function calculateHorizontalSpan(
+      verticalForceAtAnchor,
+      horizontalForce,
+      weightPerMeter,
+      chainLength
+    ) {
+      return (
+        horizontalForce /
+        weightPerMeter *
+        (
+          Math.asinh(
+            (
+              verticalForceAtAnchor +
+              weightPerMeter * chainLength
+            ) /
+            horizontalForce
+          ) -
+          Math.asinh(
+            verticalForceAtAnchor /
+            horizontalForce
+          )
+        )
+      );
+    }
+
+    function calculateMaximumZeroAngleLoad(
+      chainLength,
+      height,
+      weightPerMeter
+    ) {
+      if (chainLength <= height) {
+        return 0;
+      }
+
+      return (
+        weightPerMeter *
+        (
+          chainLength * chainLength -
+          height * height
+        ) /
+        (2 * height)
+      );
+    }
+
+    function calculate() {
+      hideError();
+
+      try {
+        const input = readInput();
+        validateInput(input);
+
+        const height =
+          input.waterDepth +
+          input.additionalWater +
+          input.bowHeight;
+
+        let baseHorizontalForce;
+        let windResult = null;
+
+        if (input.loadSource === "wind") {
+          windResult = calculateWindLoad(
+            input.windSpeedKnots,
+            input.effectiveWindArea
+          );
+
+          baseHorizontalForce = windResult.force;
+        } else {
+          baseHorizontalForce =
+            input.horizontalLoadKN * 1000;
+        }
+
+        const horizontalForce =
+          baseHorizontalForce * input.loadFactor;
+
+        const buoyancyFactor =
+          1 - WATER_DENSITY / STEEL_DENSITY;
+
+        const weightPerMeter =
+          input.chainMass *
+          GRAVITY *
+          buoyancyFactor;
+
+        const parameterA =
+          horizontalForce / weightPerMeter;
+
+        const requiredSuspendedLength = Math.sqrt(
+          height * height +
+          2 *
+          horizontalForce *
+          height /
+          weightPerMeter
+        );
+
+        const requiredSuspendedSpan =
+          parameterA *
+          Math.acosh(
+            1 + height / parameterA
+          );
+
+        const common = {
+          input,
+          height,
+          windResult,
+          baseHorizontalForce,
+          horizontalForce,
+          weightPerMeter,
+          parameterA,
+          requiredSuspendedLength,
+          requiredSuspendedSpan
+        };
+
+        const result =
+          calculationMode === "required"
+            ? calculateRequiredMode(common)
+            : calculateAvailableMode(common);
+
+        displayResult(result, input);
+        drawDiagram(result, input);
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+
+    function calculateRequiredMode(data) {
+      const seabedLength =
+        data.input.seabedReserve;
+
+      const totalLength =
+        data.requiredSuspendedLength +
+        seabedLength;
+
+      const horizontalSpan =
+        data.requiredSuspendedSpan +
+        seabedLength;
+
+      const verticalForceAtBow =
+        data.weightPerMeter *
+        data.requiredSuspendedLength;
+
+      return {
+        ...data,
+        mode: "required",
+        hasSeabedContact: true,
+        totalLength,
+        suspendedLength:
+          data.requiredSuspendedLength,
+        seabedLength,
+        horizontalSpan,
+        verticalForceAtAnchor: 0,
+        anchorAngle: 0,
+        anchorTension:
+          data.horizontalForce,
+        verticalForceAtBow,
+        bowTension: Math.hypot(
+          data.horizontalForce,
+          verticalForceAtBow
+        ),
+        maximumZeroAngleLoad:
+          calculateMaximumZeroAngleLoad(
+            totalLength,
+            data.height,
+            data.weightPerMeter
+          )
+      };
+    }
+
+    function calculateAvailableMode(data) {
+      const totalLength =
+        data.input.availableLength;
+
+      if (totalLength <= data.height) {
+        throw new Error(
+          "Die Kette muss länger als der vertikale Abstand " +
+          "zwischen Anker und Bugrolle sein."
+        );
+      }
+
+      const maximumZeroAngleLoad =
+        calculateMaximumZeroAngleLoad(
+          totalLength,
+          data.height,
+          data.weightPerMeter
+        );
+
+      if (
+        totalLength >=
+        data.requiredSuspendedLength
+      ) {
+        const seabedLength =
+          totalLength -
+          data.requiredSuspendedLength;
+
+        const verticalForceAtBow =
+          data.weightPerMeter *
+          data.requiredSuspendedLength;
+
+        return {
+          ...data,
+          mode: "available",
+          hasSeabedContact: true,
+          totalLength,
+          suspendedLength:
+            data.requiredSuspendedLength,
+          seabedLength,
+          horizontalSpan:
+            seabedLength +
+            data.requiredSuspendedSpan,
+          verticalForceAtAnchor: 0,
+          anchorAngle: 0,
+          anchorTension:
+            data.horizontalForce,
+          verticalForceAtBow,
+          bowTension: Math.hypot(
+            data.horizontalForce,
+            verticalForceAtBow
+          ),
+          maximumZeroAngleLoad
+        };
+      }
+
+      const verticalForceAtAnchor =
+        solveVerticalForceAtAnchor(
+          data.horizontalForce,
+          data.weightPerMeter,
+          totalLength,
+          data.height
+        );
+
+      const horizontalSpan =
+        calculateHorizontalSpan(
+          verticalForceAtAnchor,
+          data.horizontalForce,
+          data.weightPerMeter,
+          totalLength
+        );
+
+      const verticalForceAtBow =
+        verticalForceAtAnchor +
+        data.weightPerMeter *
+        totalLength;
+
+      return {
+        ...data,
+        mode: "available",
+        hasSeabedContact: false,
+        totalLength,
+        suspendedLength: totalLength,
+        seabedLength: 0,
+        horizontalSpan,
+        verticalForceAtAnchor,
+        anchorAngle:
+          Math.atan2(
+            verticalForceAtAnchor,
+            data.horizontalForce
+          ) *
+          180 /
+          Math.PI,
+        anchorTension: Math.hypot(
+          data.horizontalForce,
+          verticalForceAtAnchor
+        ),
+        verticalForceAtBow,
+        bowTension: Math.hypot(
+          data.horizontalForce,
+          verticalForceAtBow
+        ),
+        maximumZeroAngleLoad
+      };
+    }
+
+    function displayResult(result, input) {
+      setText(
+        "totalLength",
+        formatMeters(result.totalLength)
+      );
+
+      setText(
+        "suspendedLength",
+        formatMeters(result.suspendedLength)
+      );
+
+      setText(
+        "seabedLength",
+        formatMeters(result.seabedLength)
+      );
+
+      setText(
+        "horizontalSpan",
+        formatMeters(result.horizontalSpan)
+      );
+
+      setText(
+        "anchorAngle",
+        formatNumber(result.anchorAngle, 2) + "°"
+      );
+
+      setText(
+        "anchorTension",
+        formatKilonewtons(result.anchorTension)
+      );
+
+      setText(
+        "bowTension",
+        formatKilonewtons(result.bowTension)
+      );
+
+      setText(
+        "baseLoad",
+        formatKilonewtons(result.baseHorizontalForce)
+      );
+
+      setText(
+        "effectiveLoad",
+        formatKilonewtons(result.horizontalForce)
+      );
+
+      setText(
+        "maximumZeroAngleLoad",
+        formatKilonewtons(
+          result.maximumZeroAngleLoad
+        )
+      );
+
+      setText(
+        "submergedWeight",
+        formatNumber(result.weightPerMeter, 2) +
+        " N/m"
+      );
+
+      setText(
+        "verticalHeight",
+        formatMeters(result.height)
+      );
+
+      setText(
+        "parameterA",
+        formatMeters(result.parameterA)
+      );
+
+      updateMainStatus(result);
+      updateWorkingLoadStatus(
+        result,
+        input.workingLoadKN
+      );
+
+      updateWindPreview(result, input);
+    }
+
+    function updateMainStatus(result) {
+      if (result.mode === "required") {
+        setStatus(
+          "mainStatus",
+          "success",
+          "Für einen horizontalen Verlauf am Meeresboden " +
+          "werden " +
+          formatMeters(result.suspendedLength) +
+          " freihängende Kette benötigt. Mit Bodenlänge " +
+          "beträgt die Gesamtlänge " +
+          formatMeters(result.totalLength) +
+          "."
+        );
+
+        return;
+      }
+
+      if (result.hasSeabedContact) {
+        setStatus(
+          "mainStatus",
+          result.seabedLength < 0.5
+            ? "warning"
+            : "success",
+          "Die vorhandene Kette ist lang genug. " +
+          formatMeters(result.seabedLength) +
+          " liegen im statischen Modell auf dem Boden. " +
+          "Der Winkel am Anker beträgt 0°."
+        );
+
+        return;
+      }
+
+      const missing =
+        result.requiredSuspendedLength -
+        result.totalLength;
+
+      setStatus(
+        "mainStatus",
+        "danger",
+        "Die Kette ist vollständig vom Boden abgehoben. " +
+        "Der Winkel am Anker beträgt " +
+        formatNumber(result.anchorAngle, 2) +
+        "°. Für einen horizontalen Verlauf fehlen ungefähr " +
+        formatMeters(missing) +
+        "."
+      );
+    }
+
+    function updateWorkingLoadStatus(
+      result,
+      workingLoadKN
+    ) {
+      if (workingLoadKN <= 0) {
+        setStatus(
+          "loadStatus",
+          "neutral",
+          "Keine Festigkeitsprüfung: Es wurde keine " +
+          "zulässige Arbeitslast eingegeben."
+        );
+
+        return;
+      }
+
+      const maximumTension = Math.max(
+        result.anchorTension,
+        result.bowTension
+      );
+
+      const utilization =
+        maximumTension /
+        (workingLoadKN * 1000) *
+        100;
+
+      let type = "success";
+
+      if (utilization > 100) {
+        type = "danger";
+      } else if (utilization > 80) {
+        type = "warning";
+      }
+
+      setStatus(
+        "loadStatus",
+        type,
+        "Rechnerische Auslastung der eingegebenen " +
+        "Arbeitslast: " +
+        formatNumber(utilization, 1) +
+        " %."
+      );
+    }
+
+    function updateWindPreview(result, input) {
+      if (
+        input.loadSource !== "wind" ||
+        !result.windResult
+      ) {
+        return;
+      }
+
+      const wind = result.windResult;
+
+      element("windLoadPreview").innerHTML =
+        "<strong>Statische Windlast:</strong> " +
+        formatNumber(wind.force / 1000, 2) +
+        " kN<br>" +
+
+        "Windgeschwindigkeit: " +
+        formatNumber(
+          wind.speedMetersPerSecond,
+          2
+        ) +
+        " m/s<br>" +
+
+        "Dynamischer Winddruck: " +
+        formatNumber(
+          wind.dynamicPressure,
+          1
+        ) +
+        " N/m²<br>" +
+
+        "Last nach Faktor " +
+        formatNumber(input.loadFactor, 2) +
+        ": <strong>" +
+        formatNumber(
+          result.horizontalForce / 1000,
+          2
+        ) +
+        " kN</strong>";
+    }
+
+    function createChainPoints(
+      result,
+      startX,
+      count
+    ) {
+      const points = [];
+
+      const horizontalForce =
+        result.horizontalForce;
+
+      const weightPerMeter =
+        result.weightPerMeter;
+
+      const verticalForceAtAnchor =
+        result.verticalForceAtAnchor;
+
+      const lowerTension = Math.hypot(
+        horizontalForce,
+        verticalForceAtAnchor
+      );
+
+      const lowerAsinh = Math.asinh(
+        verticalForceAtAnchor /
+        horizontalForce
+      );
+
+      for (let index = 0; index <= count; index++) {
+        const arcLength =
+          result.suspendedLength *
+          index /
+          count;
+
+        const verticalForce =
+          verticalForceAtAnchor +
+          weightPerMeter *
+          arcLength;
+
+        const modelX =
+          startX +
+          horizontalForce /
+          weightPerMeter *
+          (
+            Math.asinh(
+              verticalForce /
+              horizontalForce
+            ) -
+            lowerAsinh
+          );
+
+        const modelY =
+          (
+            Math.hypot(
+              horizontalForce,
+              verticalForce
+            ) -
+            lowerTension
+          ) /
+          weightPerMeter;
+
+        points.push({
+          x: modelX,
+          y: modelY
+        });
+      }
+
+      return points;
+    }
+
+    function drawDiagram(result, input) {
+      const svg = element("diagram");
+
+      const width = 850;
+      const height = 430;
+
+      const left = 65;
+      const right = 55;
+      const top = 45;
+      const bottom = 75;
+
+      const plotWidth =
+        width - left - right;
+
+      const plotHeight =
+        height - top - bottom;
+
+      const maximumX =
+        Math.max(result.horizontalSpan, 0.1);
+
+      const maximumY =
+        Math.max(result.height, 0.1);
+
+      const mapX = value =>
+        left +
+        value /
+        maximumX *
+        plotWidth;
+
+      const mapY = value =>
+        height -
+        bottom -
+        value /
+        maximumY *
+        plotHeight;
+
+      const seabedLength =
+        result.hasSeabedContact
+          ? result.seabedLength
+          : 0;
+
+      const points = [];
+
+      if (result.hasSeabedContact) {
+        points.push({
+          x: 0,
+          y: 0
+        });
+
+        points.push({
+          x: seabedLength,
+          y: 0
+        });
+      }
+
+      points.push(
+        ...createChainPoints(
+          result,
+          seabedLength,
+          140
+        )
+      );
+
+      const polyline = points
+        .map(point => {
+          return (
+            mapX(point.x) +
+            "," +
+            mapY(point.y)
+          );
+        })
+        .join(" ");
+
+      const waterHeight =
+        Math.max(
+          0,
+          Math.min(
+            result.height,
+            result.height - input.bowHeight
+          )
+        );
+
+      const waterY = mapY(waterHeight);
+      const floorY = mapY(0);
+      const anchorX = mapX(0);
+      const boatX = mapX(result.horizontalSpan);
+      const boatY = mapY(result.height);
+      const touchdownX = mapX(seabedLength);
+
+      const touchdown =
+        result.hasSeabedContact
+          ? `
+            <circle
+              cx="${touchdownX}"
+              cy="${floorY}"
+              r="6"
+              fill="#f59e0b"
+            />
+
+            <text
+              x="${touchdownX}"
+              y="${floorY + 27}"
+              text-anchor="middle"
+              fill="#78350f"
+              font-size="12"
+            >
+              Ablösepunkt
+            </text>
+          `
+          : "";
+
+      const warning =
+        result.hasSeabedContact
+          ? ""
+          : `
+            <text
+              x="${width / 2}"
+              y="27"
+              text-anchor="middle"
+              fill="#b91c1c"
+              font-size="15"
+              font-weight="700"
+            >
+              Kette vollständig abgehoben
+            </text>
+          `;
+
+      svg.innerHTML = `
+        <defs>
+          <linearGradient
+            id="waterGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop
+              offset="0%"
+              stop-color="#bae6fd"
+              stop-opacity="0.8"
+            />
+
+            <stop
+              offset="100%"
+              stop-color="#38bdf8"
+              stop-opacity="0.38"
+            />
+          </linearGradient>
+        </defs>
+
+        <rect
+          x="0"
+          y="0"
+          width="${width}"
+          height="${waterY}"
+          fill="#f0f9ff"
+        />
+
+        <rect
+          x="0"
+          y="${waterY}"
+          width="${width}"
+          height="${floorY - waterY}"
+          fill="url(#waterGradient)"
+        />
+
+        <line
+          x1="0"
+          y1="${waterY}"
+          x2="${width}"
+          y2="${waterY}"
+          stroke="#0284c7"
+          stroke-width="2"
+          stroke-dasharray="8 5"
+        />
+
+        <text
+          x="75"
+          y="${Math.max(20, waterY - 8)}"
+          fill="#0369a1"
+          font-size="13"
+        >
+          Wasseroberfläche
+        </text>
+
+        <rect
+          x="0"
+          y="${floorY}"
+          width="${width}"
+          height="${height - floorY}"
+          fill="#d6b47a"
+        />
+
+        <line
+          x1="0"
+          y1="${floorY}"
+          x2="${width}"
+          y2="${floorY}"
+          stroke="#8b5e34"
+          stroke-width="3"
+        />
+
+        <polyline
+          points="${polyline}"
+          fill="none"
+          stroke="#1e293b"
+          stroke-width="5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+
+        <circle
+          cx="${anchorX}"
+          cy="${floorY}"
+          r="8"
+          fill="#b91c1c"
+        />
+
+        <text
+          x="${anchorX + 12}"
+          y="${floorY - 13}"
+          fill="#7f1d1d"
+          font-size="14"
+          font-weight="700"
+        >
+          Anker
+        </text>
+
+        ${touchdown}
+
+        <circle
+          cx="${boatX}"
+          cy="${boatY}"
+          r="8"
+          fill="#0369a1"
+        />
+
+        <text
+          x="${boatX - 8}"
+          y="${boatY + 25}"
+          text-anchor="end"
+          fill="#075985"
+          font-size="14"
+          font-weight="700"
+        >
+          Bugrolle
+        </text>
+
+        <line
+          x1="${boatX}"
+          y1="${floorY}"
+          x2="${boatX}"
+          y2="${boatY}"
+          stroke="#64748b"
+          stroke-dasharray="5 5"
+        />
+
+        <text
+          x="${boatX - 8}"
+          y="${(floorY + boatY) / 2}"
+          text-anchor="end"
+          fill="#475569"
+          font-size="12"
+        >
+          h = ${formatNumber(result.height)} m
+        </text>
+
+        <line
+          x1="${anchorX}"
+          y1="${height - 26}"
+          x2="${boatX}"
+          y2="${height - 26}"
+          stroke="#475569"
+        />
+
+        <text
+          x="${(anchorX + boatX) / 2}"
+          y="${height - 39}"
+          text-anchor="middle"
+          fill="#334155"
+          font-size="13"
+        >
+          ${formatNumber(result.horizontalSpan)} m
+        </text>
+
+        ${warning}
+      `;
+    }
+
+    element("modeRequiredButton")
+      .addEventListener(
+        "click",
+        () => setMode("required")
+      );
+
+    element("modeAvailableButton")
+      .addEventListener(
+        "click",
+        () => setMode("available")
+      );
+
+    element("chainPreset")
+      .addEventListener(
+        "change",
+        updateChainSelection
+      );
+
+    element("loadSource")
+      .addEventListener(
+        "change",
+        updateLoadSource
+      );
+
+    element("calculateButton")
+      .addEventListener(
+        "click",
+        calculate
+      );
+
+    document
+      .querySelectorAll("input")
+      .forEach(input => {
+        input.addEventListener(
+          "input",
+          calculate
+        );
+      });
+
+    updateChainSelection();
+    updateLoadSource();
+    setMode("required");
+  </script>
+
+  <!-- Service Worker für den Offlinebetrieb -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", async () => {
+        try {
+          const registration =
+            await navigator.serviceWorker.register(
+              "./service-worker.js",
+              {
+                scope: "./"
+              }
+            );
+
+          console.log(
+            "Offline-Funktion aktiviert:",
+            registration.scope
+          );
+        } catch (error) {
+          console.error(
+            "Service Worker konnte nicht registriert werden:",
+            error
+          );
+        }
+      });
+    }
+  </script>
+</body>
+</html>
