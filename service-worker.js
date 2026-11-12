@@ -5,7 +5,7 @@
  *
  * v1 -> v2 -> v3
  */
-const CACHE_NAME = "ankerketten-rechner-v1";
+const CACHE_NAME = "ankerketten-rechner-v2";
 
 /*
  * Dateien, die für den Offlinebetrieb gespeichert werden.
