@@ -63,4 +63,15 @@
     stroke-linecap="round"
     stroke-linejoin="round"
   />
+
+  <path
+    d="
+      M95 180
+      C145 145 190 145 225 180
+    "
+    fill="none"
+    stroke="#f59e0b"
+    stroke-width="18"
+    stroke-linecap="round"
+  />
 </svg>

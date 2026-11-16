@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "Ankerketten-Rechner",
-  "short_name": "Ankerkette",
-  "description": "Statischer Rechner für Ankerkette, Kettenlinie und Windlast eines Segelboots.",
+  "name": "Ankerketten- und Ankerleinen-Rechner",
+  "short_name": "Ankerrechner",
+  "description": "Offlinefähiger Rechner für Ankerkette, Kettenvorlauf, elastische Ankerleine und Windlast.",
   "lang": "de-DE",
   "start_url": "./",
   "scope": "./",

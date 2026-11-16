@@ -1,25 +1,22 @@
 "use strict";
 
 /*
- * Bei jeder neuen veröffentlichten Version erhöhen:
+ * Bei jeder veröffentlichten Änderung erhöhen:
  *
- * v1 -> v2 -> v3
+ * v1 → v2 → v3
  */
-const CACHE_NAME = "ankerketten-rechner-v2";
+const CACHE_NAME =
+  "ankerketten-rechner-v2";
 
-/*
- * Dateien, die für den Offlinebetrieb gespeichert werden.
- */
 const APP_FILES = [
   "./",
   "./index.html",
+  "./styles.css",
+  "./app.js",
   "./manifest.webmanifest",
   "./icon.svg"
 ];
 
-/*
- * App-Dateien bei der Installation herunterladen.
- */
 self.addEventListener("install", event => {
   event.waitUntil(
     caches
@@ -32,16 +29,13 @@ self.addEventListener("install", event => {
   self.skipWaiting();
 });
 
-/*
- * Alte Cache-Versionen löschen.
- */
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches
       .keys()
-      .then(cacheNames => {
+      .then(names => {
         return Promise.all(
-          cacheNames
+          names
             .filter(name => {
               return name !== CACHE_NAME;
             })
@@ -56,14 +50,6 @@ self.addEventListener("activate", event => {
   );
 });
 
-/*
- * Seitenaufrufe:
- * Zuerst das Netz versuchen, bei fehlender Verbindung
- * die gespeicherte App laden.
- *
- * Andere Dateien:
- * Zuerst den Cache prüfen.
- */
 self.addEventListener("fetch", event => {
   const request = event.request;
 
@@ -71,20 +57,21 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  const requestUrl = new URL(request.url);
+  const url = new URL(request.url);
 
-  /*
-   * Nur Dateien der eigenen GitHub-Pages-Seite bearbeiten.
-   */
-  if (requestUrl.origin !== self.location.origin) {
+  if (url.origin !== self.location.origin) {
     return;
   }
 
+  /*
+   * HTML-Navigation: möglichst aktuelle Netzversion,
+   * offline die gespeicherte App.
+   */
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
-        .then(networkResponse => {
-          const copy = networkResponse.clone();
+        .then(response => {
+          const copy = response.clone();
 
           caches
             .open(CACHE_NAME)
@@ -95,23 +82,23 @@ self.addEventListener("fetch", event => {
               );
             });
 
-          return networkResponse;
+          return response;
         })
         .catch(async () => {
-          const cachedIndex =
-            await caches.match("./index.html");
-
-          if (cachedIndex) {
-            return cachedIndex;
-          }
-
-          return caches.match("./");
+          return (
+            await caches.match("./index.html")
+          ) || (
+            await caches.match("./")
+          );
         })
     );
 
     return;
   }
 
+  /*
+   * App-Dateien: Cache zuerst.
+   */
   event.respondWith(
     caches
       .match(request)
@@ -129,7 +116,8 @@ self.addEventListener("fetch", event => {
               return networkResponse;
             }
 
-            const copy = networkResponse.clone();
+            const copy =
+              networkResponse.clone();
 
             caches
               .open(CACHE_NAME)
