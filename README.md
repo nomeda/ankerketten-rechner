@@ -1,45 +1,43 @@
-# Ankerketten-Rechner
+# ⚓ Ankerketten- und Ankerleinen-Rechner
 
-Eine offlinefähige Web-App zur statischen Berechnung einer
-Ankerkette anhand der Kettenliniengleichung.
+Eine offlinefähige Progressive Web App zur statischen Berechnung
+eines Ankergeschirrs für Segelboote.
+
+Die Anwendung unterstützt:
+
+- eine reine Ankerkette
+- einen festen Kettenvorlauf mit elastischer Ankerleine
+- die Abschätzung der horizontalen Belastung aus der
+  Windgeschwindigkeit
+- gemessene Kraft-Dehnungs-Kennlinien verschiedener Ankerleinen
+
+Die Berechnungen laufen vollständig lokal im Browser. Nach der
+Installation kann die Anwendung auch ohne Internetverbindung
+verwendet werden.
+
+---
 
 ## Funktionen
 
-- Berechnung der benötigten Kettenlänge
-- Prüfung einer vorhandenen Kettenlänge
-- Randbedingung: horizontaler Kettenverlauf am Meeresboden
-- Berechnung des Ankerwinkels bei vollständig abgehobener Kette
-- Abschätzung der statischen Windlast eines Segelboots
-- Auswahl von 6-mm-, 8-mm- und 10-mm-Ankerketten
-- benutzerdefiniertes Kettengewicht
-- optionale Festigkeitsprüfung
-- grafische Darstellung der Kettenlinie
-- Offlinebetrieb als Progressive Web App
+### Reine Ankerkette
 
-## Installation auf dem iPhone
+Die Anwendung kann:
 
-1. Die GitHub-Pages-Adresse in Safari öffnen.
-2. Die Seite einmal vollständig laden lassen.
-3. Auf das Teilen-Symbol tippen.
-4. „Zum Home-Bildschirm“ auswählen.
-5. Die App über das neue Symbol starten.
-6. Anschließend kann die App auch offline verwendet werden.
+- die benötigte Kettenlänge berechnen
+- eine vorhandene Kettenlänge prüfen
+- den frei hängenden Kettenanteil berechnen
+- die auf dem Meeresboden liegende Kettenlänge bestimmen
+- den horizontalen Abstand zwischen Anker und Bugrolle berechnen
+- den Winkel der Kette am Anker bestimmen
+- die Zugkräfte am Anker und an der Bugrolle berechnen
+- die Kettenlinie grafisch darstellen
 
-## Berechnungsmodell
+Für den Grenzfall eines horizontalen Kettenverlaufs am Anker wird
+die klassische Kettenliniengleichung verwendet.
 
-Die Anwendung verwendet ein vereinfachtes statisches Modell.
+### Kettenvorlauf und Ankerleine
 
-Nicht vollständig berücksichtigt werden:
+Bei einem kombinierten Ankergeschirr gilt:
 
-- Wellen
-- Schiffsbewegungen
-- Gieren am Anker
-- dynamische Ruckbelastungen
-- Strömung
-- Bodenreibung
-- Gefälle des Meeresbodens
-- Kettenelastizität
-- Ankertyp und Ankergeometrie
-- Haltekraft und Beschaffenheit des Ankergrundes
-
-Die Ergebnisse stellen keine garantierte sichere Ankerauslegung dar.
+```text
+Anker → fester Kettenvorlauf → elastische Ankerleine → Bugrolle
