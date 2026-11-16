@@ -6,7 +6,7 @@
  * v1 → v2 → v3
  */
 const CACHE_NAME =
-  "ankerketten-rechner-v2";
+  "ankerketten-rechner-v3";
 
 const APP_FILES = [
   "./",
