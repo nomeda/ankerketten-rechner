@@ -22,8 +22,6 @@ kann die Anwendung auch ohne Internetverbindung verwendet werden.
 Der Ankerrechner untersucht die statische Form und Belastung eines
 Ankergeschirrs zwischen Anker und Bugrolle:
 
-```text
-Anker → Ankergeschirr → Bugrolle
 Die Anwendung beantwortet insbesondere folgende Fragen:
 
 Wie viel Ankerkette wird bei einer bestimmten Wassertiefe und horizontalen Belastung benötigt?
